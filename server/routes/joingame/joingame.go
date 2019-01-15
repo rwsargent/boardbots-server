@@ -13,7 +13,7 @@ import (
 
 type (
 	Handler struct {
-		GameManager manager.GameManager
+		GameManager *manager.GameManager
 	}
 
 	Request struct {
@@ -34,7 +34,7 @@ func (h *Handler) JoinGame(ctx echo.Context) error {
 			Error : err.Error(),
 		})
 	}
-	game, err := h.GameManager.GetGame(req.GameId);
+	game, err := (*h.GameManager).GetGame(req.GameId)
 	if game == nil {
 		return echo.NewHTTPError(http.StatusBadRequest, transport.BaseResponse{
 			Error : fmt.Sprintf("Could not find a game with id: %s. %s", req.GameId.String(), err),

@@ -8,6 +8,8 @@ import (
 	"strings"
 	"io"
 	"bytes"
+	"net/http"
+	"boardbots/server/context"
 )
 
 var TestUUID = uuid.MustParse("c67a791f-1d1b-41ae-b21b-14f79d4fdf66")
@@ -39,4 +41,11 @@ func FakeContext(method, path, payload string) (echo.Context, *httptest.Response
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	recorder := httptest.NewRecorder()
 	return e.NewContext(req, recorder), recorder
+}
+
+func FakeBBContext() (echo.Context, *httptest.ResponseRecorder) {
+	ctx, rec := FakeContext(http.MethodPost, "/test", "")
+	bbCtx := context.DefaultBBContext{}
+	bbCtx.Context = ctx
+	return bbCtx, rec
 }

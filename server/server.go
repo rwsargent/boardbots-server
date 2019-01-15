@@ -8,15 +8,27 @@ import (
 	"context"
 	"time"
 	"boardbots/server/routes/makegame"
+	"boardbots/manager"
+	"boardbots/server/middleware"
+	"boardbots/server/routes/joingame"
 )
 
 func StartEchoServer() {
 	server := echo.New()
 	server.Logger.SetLevel(log.DEBUG)
 
+	gameManager := manager.NewMemoryGameManager()
+	api := server.Group("/api", middleware.ContextHander)
 	// Apply Routes
-	h := makegame.Handler{}
-	server.POST("/makegame", h.MakeGame)
+	h := makegame.Handler{
+		GameManager: gameManager,
+	}
+	api.POST("/makegame", h.MakeGame)
+
+	gamesApi := api.Group("/g")
+
+	joinGameHandler := joingame.Handler{}
+	gamesApi.POST("/join", joinGameHandler.JoinGame)
 
 	go func() {
 		if err := server.Start(":8080"); err != nil {

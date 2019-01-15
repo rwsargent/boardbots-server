@@ -22,6 +22,7 @@ type
 	PlayerPrinciple struct {
 		UserName string
 		UserId uuid.UUID
+		Password string
 	}
 )
 

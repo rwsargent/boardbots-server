@@ -19,7 +19,7 @@ import (
 
 func TestHandler_JoinGame(t *testing.T) {
 	ctx, recorder := fakeContext(http.MethodPost, "/joingame", `{"gameId":"2ce1f41c-3a2e-402a-852b-737321e3ec7d"}`)
-	bbCtx := context.DefaultBBContext{ctx, context.PlayerPrinciple{UserName: "name"}}
+	bbCtx := context.DefaultBBContext{ctx, context.PlayerPrinciple{UserName: "name"}, nil}
 	handler := fakeHandler("12345432-3a2e-402a-852b-737321e3ec7d", &quoridor.Game{})
 
 	result := handler.JoinGame(bbCtx)
@@ -34,7 +34,7 @@ func TestHandler_JoinGame(t *testing.T) {
 
 func TestUnknownGame(t *testing.T) {
 	ctx, _ := fakeContext(http.MethodPost, "/joingame", `{"gameId":"2ce1f41c-3a2e-402a-852b-737321e3ec7d"}`)
-	bbCtx := context.DefaultBBContext{ctx, context.PlayerPrinciple{UserName: "name"}}
+	bbCtx := context.DefaultBBContext{ctx, context.PlayerPrinciple{UserName: "name"}, nil}
 	handler := fakeHandler("12345432-3a2e-402a-852b-737321e3ec7d", nil)
 
 	result := handler.JoinGame(bbCtx).(*echo.HTTPError)
@@ -43,11 +43,14 @@ func TestUnknownGame(t *testing.T) {
 	}
 }
 
-
 func TestPlayerIsAddedToGame(t *testing.T) {
 	ctx, recorder := fakeContext(http.MethodPost, "/joingame", `{"gameId":"2ce1f41c-3a2e-402a-852b-737321e3ec7d"}`)
-	bbCtx := context.DefaultBBContext{ctx, context.PlayerPrinciple{UserName: "name",
-	UserId: uuid.MustParse("54321543-3a2e-402a-852b-737321e3ec7d")}}
+	bbCtx := context.DefaultBBContext{
+		ctx,
+		context.PlayerPrinciple{
+			UserName: "name",
+			UserId: uuid.MustParse("54321543-3a2e-402a-852b-737321e3ec7d")},
+		nil}
 	game := quoridor.NewTwoPersonGame()
 	game.Players[quoridor.PlayerOne].PlayerId = uuid.New()
 	handler := fakeHandler("12345432-3a2e-402a-852b-737321e3ec7d", game)
@@ -63,7 +66,7 @@ func TestPlayerIsAddedToGame(t *testing.T) {
 	}
 }
 
-func fakeContext(method , path, payload string) (echo.Context, *httptest.ResponseRecorder) {
+func fakeContext(method, path, payload string) (echo.Context, *httptest.ResponseRecorder) {
 	e := echo.New()
 	req := httptest.NewRequest(method, path, strings.NewReader(payload))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)

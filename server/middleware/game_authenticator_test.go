@@ -28,6 +28,7 @@ func Test_GameAuthenticator(t *testing.T) {
 		PlayerPrinciple : context.PlayerPrinciple{
 			UserId: tu.TestUUID,
 			UserName : "Ryan!",
+			Password : "Password",
 		},
 		Game : nil,
 	}
