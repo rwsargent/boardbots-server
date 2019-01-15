@@ -18,3 +18,8 @@ func (portal UserPortal) GetPlayerPrinciple(username string) (context.PlayerPrin
 	args := portal.Called(username)
 	return args.Get(0).(context.PlayerPrinciple), args.Error(1)
 }
+
+func (portal UserPortal) NewUser(username, password string) error {
+	args := portal.Called(username, password)
+	return args.Error(0)
+}

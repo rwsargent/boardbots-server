@@ -3,12 +3,15 @@ package persistence
 import (
 	"boardbots/server/context"
 	"errors"
+	"github.com/google/uuid"
 )
 
 type (
+	// Mocked
 	UserPortal interface {
 		ValidateCredentials(username, password string) bool
 		GetPlayerPrinciple(username string) (context.PlayerPrinciple, error)
+		NewUser(username, password string) error
 	}
 
 	InMemoryUsers struct {
@@ -31,4 +34,13 @@ func (portal *InMemoryUsers) GetPlayerPrinciple(username string) (context.Player
 	} else {
 		return context.PlayerPrinciple{}, errors.New("cannot find player")
 	}
+}
+
+func (portal *InMemoryUsers) NewUser(username, password string) error {
+	portal.Credentials[username] = password
+	portal.Principles[username] = context.PlayerPrinciple{
+		UserName: username,
+		UserId : uuid.New(),
+	}
+	return nil
 }
