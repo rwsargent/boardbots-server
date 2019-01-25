@@ -4,9 +4,8 @@ import (
 	"boardbots/quoridor"
 	"boardbots/util"
 	"sort"
-	"net/http"
-	"github.com/labstack/echo"
 	"github.com/google/uuid"
+	"net/http"
 )
 
 type (
@@ -45,9 +44,11 @@ type (
 )
 
 func StandardBadRequestError(err error) error {
-	return echo.NewHTTPError(http.StatusBadRequest, BaseResponse{
-		Error: err.Error(),
-	})
+	return HandledError{http.StatusBadRequest, err.Error()}
+}
+
+func HandledServerError(err error) error {
+	return HandledError{http.StatusInternalServerError, err.Error()}
 }
 
 func GameToGameResponse(game *quoridor.Game) GameResponse {

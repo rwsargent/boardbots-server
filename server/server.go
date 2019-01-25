@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/labstack/echo"
+	em "github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
 	"os"
 	"os/signal"
@@ -11,20 +12,25 @@ import (
 	"boardbots/manager"
 	"boardbots/server/middleware"
 	"boardbots/server/routes/joingame"
+	"boardbots/server/routes/newuser"
+	"boardbots/server/persistence"
+	"boardbots/server/transport"
 )
 
 func StartEchoServer() {
 	server := echo.New()
 	server.Logger.SetLevel(log.DEBUG)
-
+	server.Use(em.Logger())
+	transport.EchoErrorHandler(server)
+	userPortal := persistence.NewMemoryPortal()
 	gameManager := manager.NewMemoryGameManager()
+
+	newuser.ApplyRoute(server, &userPortal)
 	api := server.Group("/api", middleware.ContextHander)
-	// Apply Routes
 	h := makegame.Handler{
 		GameManager: gameManager,
 	}
 	api.POST("/makegame", h.MakeGame)
-
 	gamesApi := api.Group("/g")
 
 	joinGameHandler := joingame.Handler{}

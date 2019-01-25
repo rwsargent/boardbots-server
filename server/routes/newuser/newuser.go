@@ -24,9 +24,11 @@ func (h Handler) NewUser(ctx echo.Context) error {
 		return transport.StandardBadRequestError(err)
 	}
 	if err := h.UserPortal.NewUser(req.Username, req.Password); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, transport.BaseResponse{
-			Error: err.Error(),
-		})
+		return err
 	}
 	return ctx.NoContent(http.StatusOK)
+}
+
+func ApplyRoute(server *echo.Echo, portal persistence.UserPortal) {
+	server.POST("/newuser", Handler{portal}.NewUser)
 }

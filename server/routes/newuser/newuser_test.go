@@ -6,7 +6,6 @@ import (
 	"boardbots/server/testingutils"
 	"net/http"
 	"github.com/stretchr/testify/assert"
-	"errors"
 	"github.com/labstack/echo"
 )
 
@@ -24,15 +23,16 @@ func TestNewUserSuccess(t *testing.T) {
 	}
 }
 
-func TestNewUserFails(t *testing.T) {
+func TestNewUser_UserAlreadyExists(t *testing.T) {
 	mockPortal := mocks.UserPortal{}
-	mockPortal.On("NewUser", "username", "pass").Return(errors.New("could not compute"))
+	mockPortal.On("NewUser", "username", "pass").Return(echo.NewHTTPError(http.StatusBadRequest, "username already exists"))
+
 	handler := Handler{
 		UserPortal: mockPortal,
 	}
 	ctx, _ := testingutils.FakeContext(http.MethodPost, "/newuser", `{"username" : "username", "password" : "pass"}`)
 	result := handler.NewUser(ctx).(*echo.HTTPError)
 	if assert.Error(t, result) {
-		assert.Equal(t, http.StatusInternalServerError, result.Code)
+		assert.Equal(t, http.StatusBadRequest, result.Code)
 	}
 }
