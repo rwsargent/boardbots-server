@@ -15,6 +15,7 @@ import (
 	"boardbots/server/routes/newuser"
 	"boardbots/server/persistence"
 	"boardbots/server/transport"
+	"boardbots/server/routes/signin"
 )
 
 func StartEchoServer() {
@@ -26,6 +27,7 @@ func StartEchoServer() {
 	gameManager := manager.NewMemoryGameManager()
 
 	newuser.ApplyRoute(server, &userPortal)
+	signin.ApplyRoute(server, &userPortal)
 	api := server.Group("/api", middleware.ContextHander)
 	h := makegame.Handler{
 		GameManager: gameManager,
