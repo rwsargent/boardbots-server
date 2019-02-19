@@ -1,7 +1,9 @@
 package util
 
+
 type Position struct {
-	Row, Col int;
+	Row int `json:"row"`
+	Col int `json:"col"`
 }
 
 func AbsInt(val int) int {

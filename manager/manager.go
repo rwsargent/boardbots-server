@@ -11,6 +11,7 @@ type (
 	GameManager interface {
 		GetGame(gameId uuid.UUID) (*q.Game, error)
 		AddGame(game *q.Game) (uuid.UUID, error)
+		GetGamesForUser(playerId uuid.UUID) ([]q.Game, error)
 	}
 
 	InMemoryGameManager struct {
@@ -31,6 +32,18 @@ func (manager *InMemoryGameManager) AddGame(game *q.Game) (uuid.UUID, error) {
 	}
 	manager.games[gameId] = game
 	return gameId, nil
+}
+
+func (manager *InMemoryGameManager) GetGamesForUser(playerId uuid.UUID) ([]q.Game, error) {
+	games := make([]q.Game, 0)
+	for _, game := range manager.games {
+		for _, player := range game.Players {
+			if player.PlayerId == playerId {
+				games = append(games, *game)
+			}
+		}
+	}
+	return games, nil
 }
 
 func (manager *InMemoryGameManager) GetGame(gameId uuid.UUID) (*q.Game, error) {

@@ -33,7 +33,7 @@ func (h Handler) GetGame(ctx echo.Context) error {
 	if err != nil {
 		return transport.StandardBadRequestError(err)
 	}
-	res := transport.GameToGameResponse(game)
+	res := transport.NewTGame(*game)
 	return ctx.JSON(http.StatusOK, res)
 }
 

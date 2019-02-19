@@ -59,7 +59,7 @@ func TestPlayerIsAddedToGame(t *testing.T) {
 
 	if assert.NoError(t, result) {
 		var response Response
-		testingutils.FillResponseFromPayload(recorder, &response)
+		testingutils.ReadBodyFromRecorder(recorder, &response)
 		assert.Equal(t, Response{PlayerPosition: quoridor.PlayerTwo}, response)
 		assert.Len(t, game.Players, 2)
 		assert.NotEqual(t, uuid.Nil, game.Players[quoridor.PlayerTwo].PlayerId)

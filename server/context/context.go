@@ -10,7 +10,7 @@ type
 (
 	BBContext interface {
 		GetPlayerName() string
-		GetPlayerId()
+		GetPlayerId() uuid.UUID
 	}
 
 	DefaultBBContext struct {

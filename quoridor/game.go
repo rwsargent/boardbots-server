@@ -42,7 +42,7 @@ type Game struct {
 	Players map[PlayerPosition]*Player
 	Id uuid.UUID
 	CurrentTurn PlayerPosition
-	EndDate time.Time
+	StartDate, EndDate time.Time
 	Winner PlayerPosition
 }
 
@@ -157,3 +157,4 @@ func (game *Game) MaybeReturnWinnerPlayerPosition() PlayerPosition {
 	}
 	return -1
 }
+

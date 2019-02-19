@@ -16,6 +16,7 @@ import (
 	"boardbots/server/persistence"
 	"boardbots/server/transport"
 	"boardbots/server/routes/signin"
+	"boardbots/server/routes/getgames"
 )
 
 func StartEchoServer() {
@@ -29,14 +30,16 @@ func StartEchoServer() {
 	newuser.ApplyRoute(server, &userPortal)
 	signin.ApplyRoute(server, &userPortal)
 	api := server.Group("/api", middleware.ContextHander)
+
 	h := makegame.Handler{
 		GameManager: gameManager,
 	}
 	api.POST("/makegame", h.MakeGame)
 	gamesApi := api.Group("/g")
-
 	joinGameHandler := joingame.Handler{}
 	gamesApi.POST("/join", joinGameHandler.JoinGame)
+	getgames.ApplyRoute(gamesApi, gameManager)
+
 
 	go func() {
 		if err := server.Start(":8080"); err != nil {

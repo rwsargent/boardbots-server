@@ -52,7 +52,7 @@ func TestHandle_GetGame_FindsValidGame(t *testing.T) {
 
 	result := handler.GetGame(bbCtx)
 	var response transport.GameResponse
-	tu.FillResponseFromPayload(recorder, &response)
+	tu.ReadBodyFromRecorder(recorder, &response)
 	assert.NoError(t, result)
 	assert.Len(t, response.Board, 2)
 	assert.Equal(t, quoridor.PlayerOne, response.CurrentTurn)

@@ -10,12 +10,15 @@ import (
 	"bytes"
 	"net/http"
 	"boardbots/server/context"
+	"boardbots/quoridor"
 )
 
 var TestUUID = uuid.MustParse("c67a791f-1d1b-41ae-b21b-14f79d4fdf66")
 var TestMissingUUID = uuid.MustParse("df834d72-8d96-4010-bb37-36c60d9309cd")
-
-func getPayloadFromResult(httpError *echo.HTTPError, response *interface{}) interface{} {
+type header struct {
+name, value string
+}
+func GetPayloadFromResult(httpError *echo.HTTPError, response *interface{}) interface{} {
 	return httpError.Message.(interface{})
 }
 
@@ -27,11 +30,43 @@ func ToJson(body interface{}) io.Reader {
 	return bytes.NewBuffer(b)
 }
 
+type FakeContextBuilder struct {
+	Path, Payload, Method string
+	Headers               []header
+	Player                context.PlayerPrinciple
+	Game                  quoridor.Game
+}
 
+func DefaultFakeContextBuilder() FakeContextBuilder {
+	return FakeContextBuilder{
+		Payload: "",
+		Method:  http.MethodPost,
+		Path:    "/defaulttest",
+		Headers: make([]header, 0, 0),
+		Player:  context.PlayerPrinciple{},
+	}
+}
+
+func Build(builder FakeContextBuilder) (context.DefaultBBContext, *httptest.ResponseRecorder) {
+	e := echo.New()
+	req := httptest.NewRequest(builder.Method, builder.Path, strings.NewReader(builder.Payload))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	for _, header := range builder.Headers {
+		req.Header.Set(header.name, header.value)
+	}
+	recorder := httptest.NewRecorder()
+	echoContext := e.NewContext(req, recorder)
+	bbCtx := context.DefaultBBContext{
+		Context :        echoContext,
+		PlayerPrinciple: builder.Player,
+		Game :           &builder.Game,
+	}
+	return bbCtx, recorder
+}
 /**
  *
  */
-func FillResponseFromPayload(payload *httptest.ResponseRecorder, response interface{}){
+func ReadBodyFromRecorder(payload *httptest.ResponseRecorder, response interface{}){
 	json.NewDecoder(payload.Body).Decode(response)
 }
 
@@ -43,8 +78,8 @@ func FakeContext(method, path, payload string) (echo.Context, *httptest.Response
 	return e.NewContext(req, recorder), recorder
 }
 
-func FakeBBContext() (echo.Context, *httptest.ResponseRecorder) {
-	ctx, rec := FakeContext(http.MethodPost, "/test", "")
+func FakeBBContext(path, payload string) (context.DefaultBBContext, *httptest.ResponseRecorder) {
+	ctx, rec := FakeContext(http.MethodPost, path, payload)
 	bbCtx := context.DefaultBBContext{}
 	bbCtx.Context = ctx
 	return bbCtx, rec
