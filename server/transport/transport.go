@@ -50,6 +50,10 @@ type (
 		Game TGame `json:"game"`
 	}
 
+	GameRequest struct {
+		GameId uuid.UUID
+	}
+
 	TPiece struct {
 		Type rune `json:"type"`
 		Position util.Position `json:"position"`

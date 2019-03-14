@@ -23,6 +23,13 @@ type (
 	}
 )
 
+func ApplyRoute(group *echo.Group, gameManager manager.GameManager) {
+	h := Handler{
+		GameManager: gameManager,
+	}
+	group.POST("/getgame", h.GetGame)
+}
+
 func (h Handler) GetGame(ctx echo.Context) error {
 	bbCtx := ctx.(context.DefaultBBContext)
 	gameId, err := getGameId(bbCtx)

@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"boardbots/server/context"
 	"boardbots/quoridor"
+	"reflect"
 )
 
 var TestUUID = uuid.MustParse("c67a791f-1d1b-41ae-b21b-14f79d4fdf66")
@@ -45,6 +46,29 @@ func DefaultFakeContextBuilder() FakeContextBuilder {
 		Headers: make([]header, 0, 0),
 		Player:  context.PlayerPrinciple{},
 	}
+}
+func (b FakeContextBuilder) Override(override FakeContextBuilder) FakeContextBuilder {
+	empty := FakeContextBuilder{}
+	baseRef := reflect.ValueOf(b)
+	emptyRef := reflect.ValueOf(&empty).Elem()
+	overrideRef := reflect.ValueOf(override)
+	fcbType := emptyRef.Type()
+	for fieldIdx := 0; fieldIdx < fcbType.NumField(); fieldIdx++ {
+		field := fcbType.Field(fieldIdx)
+		overrideValue := overrideRef.FieldByName(field.Name)
+		if isEmpty(field, overrideValue) {
+			emptyRef.FieldByName(field.Name).Set(overrideValue)
+		} else {
+			baseVal := baseRef.FieldByName(field.Name)
+			emptyRef.FieldByName(field.Name).Set(baseVal)
+		}
+	}
+	return empty
+}
+
+func isEmpty(field reflect.StructField, overrideValue reflect.Value) bool {
+	return field.Type.Comparable() && overrideValue.Interface() != reflect.Zero(field.Type).Interface() ||
+		strings.HasPrefix(field.Type.Name(), "[]") && overrideValue.Len() == 0
 }
 
 func Build(builder FakeContextBuilder) (context.DefaultBBContext, *httptest.ResponseRecorder) {

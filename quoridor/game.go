@@ -126,6 +126,7 @@ func (game *Game) AddPlayer(playerId uuid.UUID) (PlayerPosition, error) {
 			game.Players[playerNumber].PlayerId = playerId
 			return playerNumber, nil
 		}
+		// TODO(rwsargent) Play against yourself?
 	}
 	return -1, errors.New("no open player positions in this game")
 }

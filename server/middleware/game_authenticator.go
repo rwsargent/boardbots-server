@@ -15,6 +15,14 @@ type (
 		GameManager manager.GameManager
 	}
 )
+
+func Authenticator(gameManager manager.GameManager) func(handlerFunc echo.HandlerFunc) echo.HandlerFunc {
+	mid := GameAuthenticator{
+		GameManager: gameManager,
+	}
+	return mid.Authenticate
+}
+
 func (ga *GameAuthenticator) Authenticate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var gameRequest transport.GameRequest

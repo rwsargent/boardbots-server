@@ -11,13 +11,15 @@ import (
 	"boardbots/server/routes/makegame"
 	"boardbots/manager"
 	"boardbots/server/middleware"
-	"boardbots/server/routes/joingame"
 	"boardbots/server/routes/newuser"
 	"boardbots/server/persistence"
 	"boardbots/server/transport"
 	"boardbots/server/routes/signin"
 	"boardbots/server/routes/getgames"
+	"boardbots/server/routes/joingame"
 )
+
+const ApiPrefix = "/api/v0"
 
 func StartEchoServer() {
 	server := echo.New()
@@ -27,18 +29,16 @@ func StartEchoServer() {
 	userPortal := persistence.NewMemoryPortal()
 	gameManager := manager.NewMemoryGameManager()
 
-	newuser.ApplyRoute(server, &userPortal)
-	signin.ApplyRoute(server, &userPortal)
-	api := server.Group("/api", middleware.ContextHander)
+	newuser.ApplyRoute(server, userPortal)
+	signin.ApplyRoute(server, userPortal)
 
-	h := makegame.Handler{
-		GameManager: gameManager,
-	}
-	api.POST("/makegame", h.MakeGame)
-	gamesApi := api.Group("/g")
-	joinGameHandler := joingame.Handler{}
-	gamesApi.POST("/join", joinGameHandler.JoinGame)
+	api := server.Group(ApiPrefix, middleware.ContextHander)
+	api.Use(em.BasicAuthWithConfig(middleware.GetBasicAuthenticator(userPortal)))
+	makegame.ApplyRoute(api, gameManager)
+
+	gamesApi := api.Group("/g", middleware.Authenticator(gameManager))
 	getgames.ApplyRoute(gamesApi, gameManager)
+	joingame.ApplyRoute(gamesApi, gameManager)
 
 
 	go func() {

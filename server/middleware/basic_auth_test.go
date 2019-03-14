@@ -16,7 +16,7 @@ func TestBasicAuth(t *testing.T) {
 	userPortal.On("ValidateCredentials", username, password).Return(true, nil)
 	userPortal.On("GetPlayerPrinciple", username).Return(context.PlayerPrinciple{}, nil)
 	authenticator := GetBasicAuthenticator(userPortal)
-	ctx, _ := testingutils.FakeBBContext()
+	ctx, _ := testingutils.FakeBBContext("", "")
 	expected, err := authenticator.Validator(username, password, ctx)
 
 	assert.NoError(t, err)
@@ -29,7 +29,7 @@ func TestAuthFails(t *testing.T) {
 	// userPortal.On("GetPlayerPrinciple", username).Return(context.PlayerPrinciple{}, nil)
 
 	authenticator := GetBasicAuthenticator(userPortal)
-	ctx, _ := testingutils.FakeBBContext()
+	ctx, _ := testingutils.FakeBBContext("", "")
 	expected, err := authenticator.Validator("", "", ctx)
 	assert.Error(t, err)
 	assert.False(t, expected)

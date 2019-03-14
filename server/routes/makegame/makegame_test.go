@@ -17,7 +17,7 @@ import (
 func TestHandler_MakeGame(t *testing.T) {
 	ctx, recorder := fakeContext(http.MethodPost, "/makegame", `{"PlayerCount" : 2}`)
 	id := uuid.MustParse("2ce1f41c-3a2e-402a-852b-737321e3ec7d")
-	bbCtx := context.DefaultBBContext{ctx, context.PlayerPrinciple{"name", id}}
+	bbCtx := context.DefaultBBContext{Context: ctx, PlayerPrinciple : context.PlayerPrinciple{"name", id, "password"}}
 	h := fakeHandler("2ce1f41c-3a2e-402a-852b-737321e3db7a")
 	result := h.MakeGame(bbCtx)
 
@@ -31,7 +31,7 @@ func TestHandler_MakeGame(t *testing.T) {
 
 func TestHandler_MakeGame_NoPlayerPrinciple(t *testing.T) {
 	ctx, _ := fakeContext(http.MethodPost, "/makegame", `{"PlayerCount" : 2}`)
-	bbCtx := context.DefaultBBContext{ctx, context.PlayerPrinciple{}}
+	bbCtx := context.DefaultBBContext{Context : ctx, PlayerPrinciple : context.PlayerPrinciple{}}
 	h := fakeHandler("2ce1f41c-3a2e-402a-852b-737321e3db7a")
 
 	result := h.MakeGame(bbCtx).(*echo.HTTPError)

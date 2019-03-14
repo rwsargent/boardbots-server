@@ -75,3 +75,7 @@ func (manager *FakeMemoryManager) GetGame(gameId uuid.UUID) (*q.Game, error) {
 func (manager *FakeMemoryManager) AddGame(game *q.Game) (uuid.UUID, error) {
 	return manager.ReturnId, nil;
 }
+
+func (manager *FakeMemoryManager) GetGamesForUser(playerId uuid.UUID) ([]q.Game, error) {
+	return nil, nil
+}

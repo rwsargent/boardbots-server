@@ -18,6 +18,15 @@ type (
 		GameId uuid.UUID `json:"gameId"`
 	}
 )
+
+func ApplyRoute(server *echo.Group, gameManager manager.GameManager) {
+	h := Handler{
+		GameManager: gameManager,
+	}
+
+	server.POST("/makegame", h.MakeGame)
+}
+
 func (h *Handler) MakeGame(ctx echo.Context) error {
 	bbCtx := ctx.(context.DefaultBBContext)
 	playerName := bbCtx.GetPlayerName()

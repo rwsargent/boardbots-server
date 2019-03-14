@@ -56,6 +56,30 @@ func TestGetGames_ErrorInGameManager(t *testing.T) {
 	}
 }
 
+func TestOverride(t *testing.T) {
+	base := tu.FakeContextBuilder{
+		Payload : "base",
+		Path : "base",
+		Game: *q.NewTwoPersonGame(),
+		Method: "base",
+		Headers: nil,
+	}
+
+	override := base.Override(tu.FakeContextBuilder{
+		Payload:"override",
+		Method : "override",
+		Game : q.Game{},
+	})
+
+	assert.Equal(t, override.Payload, "override")
+	assert.Equal(t, "base", override.Path)
+	assert.Equal(t, override.Method, "override")
+	assert.Nil(t, override.Headers)
+	assert.Equal(t, override.Game, base.Game)
+
+
+}
+
 func fakeHandler(gameManager manager.GameManager) Handler {
 	return Handler{
 		GameManager: gameManager,
