@@ -1,14 +1,21 @@
 package getgames
 
 import (
-	"boardbots/server/transport"
 	"boardbots/manager"
-	"github.com/labstack/echo"
+	"boardbots/quoridor"
 	"boardbots/server/context"
+	"boardbots/server/transport"
+	"github.com/labstack/echo"
+	"github.com/labstack/gommon/log"
 )
+
 const GetGamesRoute = "/getgames"
 
 type (
+	Request struct {
+		Status string
+	}
+
 	Response struct {
 		transport.BaseResponse
 		Games []transport.TGame `json:"games"`
@@ -19,8 +26,14 @@ type (
 	}
 )
 
-func (h Handler)Handle(ctx echo.Context) error {
-	bbCtx := ctx.(context.DefaultBBContext)
+func (h Handler) Handle(ctx echo.Context) error {
+	bbCtx := ctx.(*context.DefaultBBContext)
+	var req Request
+	if err := ctx.Bind(&req); err != nil {
+		log.Error(err)
+		return transport.StandardBadRequestError(err)
+	}
+	var games []quoridor.Game
 	games, err := h.GameManager.GetGamesForUser(bbCtx.GetPlayerId())
 	if err != nil {
 		return transport.HandledServerError(err)
@@ -31,7 +44,7 @@ func (h Handler)Handle(ctx echo.Context) error {
 		tgames = append(tgames, transport.NewTGame(game))
 	}
 	resp := Response{
-		Games : tgames,
+		Games: tgames,
 	}
 	return ctx.JSON(200, resp)
 }

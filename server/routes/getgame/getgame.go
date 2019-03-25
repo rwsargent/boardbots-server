@@ -2,13 +2,13 @@ package getgame
 
 import (
 	"boardbots/manager"
-	"github.com/google/uuid"
-	"boardbots/server/transport"
-	"github.com/labstack/echo"
 	"boardbots/server/context"
-	"net/http"
+	"boardbots/server/transport"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
+	"github.com/labstack/echo"
+	"net/http"
 )
 
 type (
@@ -31,7 +31,7 @@ func ApplyRoute(group *echo.Group, gameManager manager.GameManager) {
 }
 
 func (h Handler) GetGame(ctx echo.Context) error {
-	bbCtx := ctx.(context.DefaultBBContext)
+	bbCtx := ctx.(*context.DefaultBBContext)
 	gameId, err := getGameId(bbCtx)
 	if err != nil {
 		return transport.StandardBadRequestError(err)
@@ -44,7 +44,7 @@ func (h Handler) GetGame(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
-func getGameId(bbContext context.DefaultBBContext) (uuid.UUID, error) {
+func getGameId(bbContext *context.DefaultBBContext) (uuid.UUID, error) {
 	gameIdParam := bbContext.QueryParam("gameid")
 	if len(gameIdParam) == 0 {
 		return uuid.Nil, errors.New("no gameid query parameter")

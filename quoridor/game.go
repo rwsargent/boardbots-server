@@ -2,18 +2,22 @@ package quoridor
 
 import (
 	"boardbots/util"
-	"github.com/google/uuid"
 	"errors"
+	"fmt"
+	"github.com/google/uuid"
 	"time"
 )
+
 type PlayerPosition int
+
 const (
-	PlayerOne   PlayerPosition = iota
+	PlayerOne PlayerPosition = iota
 	PlayerTwo
 	PlayerThree
 	PlayerFour
 )
 const BoardSize int = 17
+
 var WinningPositions = map[PlayerPosition]util.Position{
 	PlayerOne:   {Row: 16, Col: -1}, //PLAYER_ONE
 	PlayerTwo:   {Col: -1},          //PLAYER_TWO
@@ -28,43 +32,45 @@ var directions = []util.Position{
 	{Col: -1},
 }
 
-type Board map[util.Position]*Piece
+type (
+	Board map[util.Position]Piece
 
-type Player struct {
-	Barriers int
-	Pawn *Piece
-	PlayerId uuid.UUID
-	PlayerName string
-}
+	Player struct {
+		Barriers   int
+		Pawn       Piece
+		PlayerId   uuid.UUID
+		PlayerName string
+	}
 
-type Game struct {
-	Board Board
-	Players map[PlayerPosition]*Player
-	Id uuid.UUID
-	CurrentTurn PlayerPosition
-	StartDate, EndDate time.Time
-	Winner PlayerPosition
-}
+	Game struct {
+		Board              Board
+		Players            map[PlayerPosition]*Player
+		Id                 uuid.UUID
+		CurrentTurn        PlayerPosition
+		StartDate, EndDate time.Time
+		Winner             PlayerPosition
+		Name               string
+	}
 
-type Piece struct {
-	Position util.Position
-	Owner PlayerPosition
-}
+	Piece struct {
+		Position util.Position
+		Owner    PlayerPosition
+	}
+)
 
 func (board Board) getValidMoveByDirection(pawn, direction util.Position) []util.Position {
 	//check if barrier in direction
 	cursor := util.Position{Row: pawn.Row + direction.Row, Col: pawn.Col + direction.Col}
-	if _, barrierPresent := board[cursor] ; barrierPresent {
+	if _, barrierPresent := board[cursor]; barrierPresent {
 		return nil
 	}
 	cursor.Row = cursor.Row + direction.Row
 	cursor.Col = cursor.Col + direction.Col
 	// check for pawn
 	validPositions := make([]util.Position, 0, 2)
-	if _, pawnPresent := board[cursor] ; pawnPresent {
+	if _, pawnPresent := board[cursor]; pawnPresent {
 		// check for possible jumps
-		if _, barrierBeyondPawn := board[util.Position{ Row: cursor.Row + direction.Row, Col: cursor.Col + direction.Col}];
-			barrierBeyondPawn {
+		if _, barrierBeyondPawn := board[util.Position{Row: cursor.Row + direction.Row, Col: cursor.Col + direction.Col}]; barrierBeyondPawn {
 			// look at diagonals instead
 			validPositions = append(validPositions, getDiagonalPositions(direction, cursor, board)...)
 		} else { // no barrier, final check for a pawn.
@@ -74,7 +80,7 @@ func (board Board) getValidMoveByDirection(pawn, direction util.Position) []util
 				validPositions = append(validPositions, jumpPos)
 			}
 		}
-	} else if isOnBoard(cursor){
+	} else if isOnBoard(cursor) {
 		validPositions = append(validPositions, cursor)
 	}
 	return validPositions
@@ -106,35 +112,36 @@ func getTurnPosition(vector util.Position, cursor util.Position, board Board) ut
 			return turnCursor
 		}
 	}
-	return util.Position{Row: -1, Col : -1}
+	return util.Position{Row: -1, Col: -1}
 }
 func isOnBoard(position util.Position) bool {
 	return !(position.Row < 0 || position.Row >= BoardSize || position.Col < 0 || position.Col >= BoardSize)
 }
 
 func (game *Game) GetPlayer(playerId uuid.UUID) *Player {
-	for _, player :=  range game.Players {
+	for _, player := range game.Players {
 		if player.PlayerId == playerId {
 			return player
 		}
 	}
 	return nil
 }
-func (game *Game) AddPlayer(playerId uuid.UUID) (PlayerPosition, error) {
+func (game *Game) AddPlayer(playerId uuid.UUID, playerName string) (PlayerPosition, error) {
 	for playerNumber := PlayerOne; playerNumber <= PlayerFour; playerNumber++ {
 		if game.Players[playerNumber].PlayerId == uuid.Nil {
 			game.Players[playerNumber].PlayerId = playerId
+			game.Players[playerNumber].PlayerName = playerName
 			return playerNumber, nil
 		}
 		// TODO(rwsargent) Play against yourself?
 	}
 	return -1, errors.New("no open player positions in this game")
 }
-func (game *Game) AddPiece(piece *Piece, position util.Position) {
+func (game *Game) AddPiece(piece Piece, position util.Position) {
 	game.Board[position] = piece
 }
 func (game *Game) NextTurn() {
-	next := int(game.CurrentTurn +1) % len(game.Players)
+	next := int(game.CurrentTurn+1) % len(game.Players)
 	game.CurrentTurn = PlayerPosition(next)
 }
 
@@ -159,3 +166,54 @@ func (game *Game) MaybeReturnWinnerPlayerPosition() PlayerPosition {
 	return -1
 }
 
+func (game *Game) Copy() Game {
+	newGame := Game{
+		Id:          game.Id,
+		CurrentTurn: game.CurrentTurn,
+		StartDate:   game.StartDate,
+		EndDate:     game.EndDate,
+		Winner:      game.Winner,
+		Name:        game.Name,
+	}
+
+	newGame.Board = make(Board)
+	for pos, piece := range game.Board {
+		newPiece := piece.Copy()
+		newGame.Board[pos] = newPiece
+	}
+
+	newGame.Players = make(map[PlayerPosition]*Player)
+	for pos, player := range game.Players {
+		newPlayer := player.Copy()
+		newGame.Players[pos] = &newPlayer
+	}
+
+	return newGame
+}
+
+func (game *Game) StartGame() error {
+	if !(len(game.Players) == 2 || len(game.Players) == 4) {
+		return errors.New(fmt.Sprintf("can't start game, wrong number of players (%d)", len(game.Players)))
+	}
+	if !game.StartDate.IsZero() {
+		return errors.New(fmt.Sprintf("can't start game, already started"))
+	}
+	game.StartDate = time.Now()
+	return nil
+}
+
+func (piece *Piece) Copy() Piece {
+	return Piece{
+		Position: piece.Position,
+		Owner:    piece.Owner,
+	}
+}
+
+func (player Player) Copy() Player {
+	return Player{
+		PlayerName: player.PlayerName,
+		PlayerId:   player.PlayerId,
+		Pawn:       player.Pawn.Copy(),
+		Barriers:   player.Barriers,
+	}
+}

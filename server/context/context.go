@@ -1,13 +1,13 @@
 package context
 
 import (
-	"github.com/labstack/echo"
-	"github.com/google/uuid"
 	"boardbots/quoridor"
+	"boardbots/server/player"
+	"github.com/google/uuid"
+	"github.com/labstack/echo"
 )
 
-type
-(
+type (
 	BBContext interface {
 		GetPlayerName() string
 		GetPlayerId() uuid.UUID
@@ -15,14 +15,8 @@ type
 
 	DefaultBBContext struct {
 		echo.Context
-		PlayerPrinciple PlayerPrinciple
-		Game *quoridor.Game
-	}
-
-	PlayerPrinciple struct {
-		UserName string
-		UserId uuid.UUID
-		Password string
+		PlayerPrinciple player.PlayerPrinciple
+		Game            *quoridor.Game
 	}
 )
 

@@ -1,14 +1,18 @@
 package makegame
 
 import (
-	"github.com/labstack/echo"
-	"net/http"
 	"boardbots/manager"
 	"boardbots/quoridor"
-	"github.com/google/uuid"
 	"boardbots/server/context"
 	"boardbots/server/transport"
+	"errors"
+	"fmt"
+	"github.com/google/uuid"
+	"github.com/labstack/echo"
+	"github.com/labstack/gommon/log"
+	"net/http"
 )
+
 type (
 	Handler struct {
 		GameManager manager.GameManager
@@ -28,7 +32,7 @@ func ApplyRoute(server *echo.Group, gameManager manager.GameManager) {
 }
 
 func (h *Handler) MakeGame(ctx echo.Context) error {
-	bbCtx := ctx.(context.DefaultBBContext)
+	bbCtx := ctx.(*context.DefaultBBContext)
 	playerName := bbCtx.GetPlayerName()
 	response := Response{}
 	if len(playerName) == 0 {
@@ -37,8 +41,15 @@ func (h *Handler) MakeGame(ctx echo.Context) error {
 	}
 
 	game := quoridor.NewTwoPersonGame()
-	game.Players[quoridor.PlayerOne].PlayerName = playerName
-	gameId, err  := h.GameManager.AddGame(game)
+	playerPosition, err := game.AddPlayer(bbCtx.PlayerPrinciple.UserId, bbCtx.PlayerPrinciple.UserName)
+	if err != nil {
+		return transport.StandardBadRequestError(err)
+	}
+	if playerPosition != quoridor.PlayerOne {
+		log.Errorf("new game can't add player")
+		return transport.HandledServerError(errors.New(fmt.Sprintf("new game can't add player, expecting 0 got %d", playerPosition)))
+	}
+	gameId, err := h.GameManager.AddGame(game)
 	if err != nil {
 		response.Error = "error saving game, " + err.Error()
 		return echo.NewHTTPError(http.StatusInternalServerError, response)

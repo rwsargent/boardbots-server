@@ -1,15 +1,15 @@
 package quoridor
 
 import (
-	"testing"
+	"boardbots/util"
 	"bufio"
 	"strings"
-	"boardbots/util"
+	"testing"
 )
 
 func TestBuildingBoard(t *testing.T) {
 	board :=
-`........0........
+		`........0........
 .................
 .................
 .................
@@ -33,11 +33,11 @@ func TestBuildingBoard(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if game.Board[util.Position{0,8}] == nil {
+	if _, ok := game.Board[util.Position{0, 8}]; !ok {
 		t.Errorf("Player one not on board created")
 	}
 
-	if game.Board[util.Position{15,8}] == nil {
+	if _, ok := game.Board[util.Position{15, 8}]; !ok {
 		t.Errorf("Missing barrier")
 	}
 
@@ -45,24 +45,21 @@ func TestBuildingBoard(t *testing.T) {
 		t.Error("Missing barrier")
 	}
 	if player, ok := game.Players[PlayerOne]; ok {
-		expected := util.Position{0,8}
-		if player.Pawn.Position != expected  {
-				t.Errorf("Pawn not created")
-			}
-	} else {
-		t.Errorf("Player not created")
-	}
-
-	if player, ok := game.Players[PlayerTwo]; ok {
-		expected := util.Position{16,8}
-		if player.Pawn.Position != expected  {
+		expected := util.Position{0, 8}
+		if player.Pawn.Position != expected {
 			t.Errorf("Pawn not created")
 		}
 	} else {
 		t.Errorf("Player not created")
 	}
 
-
-
+	if player, ok := game.Players[PlayerTwo]; ok {
+		expected := util.Position{16, 8}
+		if player.Pawn.Position != expected {
+			t.Errorf("Pawn not created")
+		}
+	} else {
+		t.Errorf("Player not created")
+	}
 
 }

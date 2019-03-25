@@ -4,11 +4,12 @@ import (
 	"boardbots/util"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"time"
 )
 
-func NewTwoPersonGame() *Game {
-	game := initGame()
+func NewTwoPersonGame(id uuid.UUID) *Game {
+	game := initGame(id)
 
 	barrierCount := 10
 	playerOne := newPlayer(barrierCount, util.Position{Col: 8}, PlayerOne)
@@ -22,8 +23,8 @@ func NewTwoPersonGame() *Game {
 	return game
 }
 
-func NewFourPersonGame() *Game{
-	game := initGame()
+func NewFourPersonGame(id uuid.UUID) *Game {
+	game := initGame(id)
 	barrierCount := 5
 	game.Players[PlayerOne] = newPlayer(barrierCount, util.Position{Col: 8}, PlayerOne)
 	game.Board[game.Players[PlayerOne].Pawn.Position] = game.Players[PlayerOne].Pawn
@@ -40,37 +41,38 @@ func NewFourPersonGame() *Game{
 	return game
 }
 
-
-func initGame() *Game {
+func initGame(id uuid.UUID) *Game {
 	game := new(Game)
-	game.Board = make(map[util.Position]*Piece)
+	game.Board = make(map[util.Position]Piece)
 	game.Players = make(map[PlayerPosition]*Player)
 	game.CurrentTurn = PlayerOne
+	game.Id = id
+	game.Name = id.String()
 	return game
 }
 
 func newPlayer(barrierCount int, position util.Position, playerPosition PlayerPosition) *Player {
 	p := new(Player)
 	p.Barriers = barrierCount
-	p.Pawn = &Piece{Position:position, Owner:playerPosition}
+	p.Pawn = Piece{Position: position, Owner: playerPosition}
 	return p
 }
 
 // Return the state of the Board after the move, of the current board if an error
 func (game *Game) MovePawn(newPosition util.Position, player PlayerPosition) (Board, error) {
-	pawn := game.Players[player].Pawn
+	pawn := &game.Players[player].Pawn
 	if !IsValidPawnLocation(newPosition) {
 		return game.Board, errors.New("invalid Pawn Location")
 	}
 	if game.CurrentTurn != player {
 		return game.Board, errors.New(fmt.Sprintf("wrong turn, current turn is for Player: %d", game.CurrentTurn))
 	}
-	if moveError := isValidPawnMove(newPosition, pawn.Position, &game.Board); len(moveError) != 0 {
-		return game.Board, errors.New(moveError)
+	if moveError := isValidPawnMove(newPosition, pawn.Position, &game.Board); moveError != nil {
+		return game.Board, moveError
 	}
 	delete(game.Board, pawn.Position)
 	pawn.Position = newPosition
-	game.Board[pawn.Position] = pawn
+	game.Board[pawn.Position] = *pawn
 	checkGameOver(game)
 	game.NextTurn()
 	return game.Board, nil
@@ -102,7 +104,7 @@ func (game *Game) PlaceBarrier(position util.Position, player PlayerPosition) (B
 		return game.Board, errors.New("the barrier prevents a players victory")
 	}
 	game.Players[player].Barriers--
-	barrier := &Piece{Position:position, Owner:player}
+	barrier := Piece{Position: position, Owner: player}
 	for _, pos := range barrierPositions {
 		game.AddPiece(barrier, pos)
 	}
@@ -110,11 +112,11 @@ func (game *Game) PlaceBarrier(position util.Position, player PlayerPosition) (B
 	return game.Board, nil
 }
 
-func invalidPosition(position util.Position) bool{
-	return position.Row & 0x1 == position.Col &0x1 || // both col and row are even or odd
-	    // can't be on the last valid row/
+func invalidPosition(position util.Position) bool {
+	return position.Row&0x1 == position.Col&0x1 || // both col and row are even or odd
+		// can't be on the last valid row/
 		!(position.Row < BoardSize-1 &&
-		(position.Col < BoardSize-1))
+			(position.Col < BoardSize-1))
 }
 
 func playerHasNoMoreBarriers(player *Player) bool {
@@ -123,10 +125,14 @@ func playerHasNoMoreBarriers(player *Player) bool {
 
 func barrierPreventsWin(positions [3]util.Position, game *Game) bool {
 	for _, position := range positions {
-		game.Board[position] = NewPiece(position)
+		game.Board[position] = Piece{Position: position, Owner: PlayerOne}
 	}
 	//remove those temporary barriers no matter what
-	defer func(){for _, position := range positions { delete(game.Board, position) }}()
+	defer func() {
+		for _, position := range positions {
+			delete(game.Board, position)
+		}
+	}()
 
 	for playerPosition, player := range game.Players {
 		path := game.FindPath(player.Pawn.Position, WinningPositions[playerPosition])
@@ -142,14 +148,14 @@ func createBarrierPositions(position util.Position) [3]util.Position {
 	if isABarrierRow(position) {
 		positions = buildHorizontalBarriers(position)
 	} else if isABarrierColumn(position) {
-		positions = buildVerticalBarriers(position);
+		positions = buildVerticalBarriers(position)
 	}
 	return positions
 }
 
 func barriersAreInTheWay(positions [3]util.Position, board Board) bool {
 	for _, pos := range positions {
-		if board[pos] != nil {
+		if _, ok := board[pos]; ok {
 			return true
 		}
 	}
@@ -179,36 +185,35 @@ func isABarrierRow(position util.Position) bool {
 	return position.Row&0x1 == 1 && position.Col&0x1 == 0
 }
 
-
 func IsValidPawnLocation(position util.Position) bool {
-	return position.Col % 2 == 0 && position.Row % 2 == 0
+	return position.Col%2 == 0 && position.Row%2 == 0
 }
 
-func isValidPawnMove(new util.Position, current util.Position, board *Board) string {
+func isValidPawnMove(new util.Position, current util.Position, board *Board) error {
 	validPawnMoves := board.GetValidPawnMoves(current)
 	for _, validPosition := range validPawnMoves {
 		if validPosition == new {
-			return ""
+			return nil
 		}
 	}
-	return "the pawn cannot reach that square"
+	return errors.New("the pawn cannot reach that square")
 
-	return ""
+	return nil
 }
 
 func (board Board) GetValidPawnMoves(pawnPosition util.Position) []util.Position {
 	validPositions := make([]util.Position, 0, 6)
 	// pawn goes down
 	validPositions = append(validPositions,
-		board.getValidMoveByDirection(pawnPosition, util.Position{1,0})...)
+		board.getValidMoveByDirection(pawnPosition, util.Position{1, 0})...)
 	// right
 	validPositions = append(validPositions,
-		board.getValidMoveByDirection(pawnPosition, util.Position{0,1})...)
+		board.getValidMoveByDirection(pawnPosition, util.Position{0, 1})...)
 	// up
 	validPositions = append(validPositions,
-		board.getValidMoveByDirection(pawnPosition, util.Position{-1,0})...)
+		board.getValidMoveByDirection(pawnPosition, util.Position{-1, 0})...)
 	// left
 	validPositions = append(validPositions,
-		board.getValidMoveByDirection(pawnPosition, util.Position{0,-1})...)
+		board.getValidMoveByDirection(pawnPosition, util.Position{0, -1})...)
 	return validPositions
 }
