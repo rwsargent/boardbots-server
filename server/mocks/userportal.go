@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"github.com/stretchr/testify/mock"
-	"boardbots/server/context"
+	"boardbots/server/player"
 )
 
 type UserPortal struct {
@@ -14,9 +14,9 @@ func (portal UserPortal) ValidateCredentials(username, password string) bool {
 	return args.Bool(0)
 }
 
-func (portal UserPortal) GetPlayerPrinciple(username string) (context.PlayerPrinciple, error) {
+func (portal UserPortal) GetPlayerPrinciple(username string) (player.PlayerPrinciple, error) {
 	args := portal.Called(username)
-	return args.Get(0).(context.PlayerPrinciple), args.Error(1)
+	return args.Get(0).(player.PlayerPrinciple), args.Error(1)
 }
 
 func (portal UserPortal) NewUser(username, password string) error {

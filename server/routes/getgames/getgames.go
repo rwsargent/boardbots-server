@@ -2,8 +2,6 @@ package getgames
 
 import (
 	"boardbots/manager"
-	"boardbots/quoridor"
-	"boardbots/server/context"
 	"boardbots/server/transport"
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
@@ -14,6 +12,7 @@ const GetGamesRoute = "/getgames"
 type (
 	Request struct {
 		Status string
+		Players []string
 	}
 
 	Response struct {
@@ -27,26 +26,33 @@ type (
 )
 
 func (h Handler) Handle(ctx echo.Context) error {
-	bbCtx := ctx.(*context.DefaultBBContext)
 	var req Request
 	if err := ctx.Bind(&req); err != nil {
 		log.Error(err)
 		return transport.StandardBadRequestError(err)
 	}
-	var games []quoridor.Game
-	games, err := h.GameManager.GetGamesForUser(bbCtx.GetPlayerId())
+	var games []manager.ManagedGame
+	params := convertRequestToParams(req)
+	games, err := h.GameManager.FindGames(params)
 	if err != nil {
 		return transport.HandledServerError(err)
 	}
 
 	tgames := make([]transport.TGame, 0, len(games))
 	for _, game := range games {
-		tgames = append(tgames, transport.NewTGame(game))
+		tgames = append(tgames, transport.NewTGame(game.Game))
 	}
 	resp := Response{
 		Games: tgames,
 	}
 	return ctx.JSON(200, resp)
+}
+
+func convertRequestToParams(request Request) manager.GameParameters {
+	return manager.GameParameters{
+		Players: request.Players,
+		GameState: request.Status,
+	}
 }
 
 func ApplyRoute(group *echo.Group, gameManager manager.GameManager) {

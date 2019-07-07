@@ -94,7 +94,7 @@ func BoardToTBoard(board quor.Board) TBoard {
 	return pieces
 }
 
-func getPieceType(piece *quor.Piece) rune {
+func getPieceType(piece quor.Piece) rune {
 	var pieceType rune
 	if quor.IsValidPawnLocation(piece.Position) {
 		pieceType = 'p'

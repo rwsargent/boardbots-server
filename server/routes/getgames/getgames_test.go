@@ -10,13 +10,19 @@ import (
 	"github.com/stretchr/testify/mock"
 	"errors"
 	"boardbots/server/transport"
+	"boardbots/server/context"
 )
 
 func TestGetGames_HappyPath(t *testing.T) {
 	mockManager := new(mocks.MockGameManager)
-	mockManager.On("GetGamesForUser", mock.Anything).
-		Return([]q.Game{*q.NewTwoPersonGame(), *q.NewTwoPersonGame(), *q.NewTwoPersonGame()}, nil)
-	bbCtx, recorder := tu.Build(tu.DefaultFakeContextBuilder())
+	mockManager.On("FindGames", mock.Anything).
+		Return([]manager.ManagedGame{
+			{Game: *q.NewTwoPersonGame(tu.TestUUID)},
+			{Game:*q.NewTwoPersonGame(tu.TestMissingUUID)},
+			{Game: *q.NewTwoPersonGame(tu.GameIds[0])},}, nil)
+	bbCtx, recorder := context.Build(context.DefaultFakeContextBuilder().Override(context.FakeContextBuilder{
+		Payload: "{}",
+	}))
 	h := fakeHandler(mockManager)
 
 	result := h.Handle(bbCtx)
@@ -29,9 +35,9 @@ func TestGetGames_HappyPath(t *testing.T) {
 
 func TestGetGames_NoErrorNoGames(t *testing.T) {
 	mockManager := new(mocks.MockGameManager)
-	mockManager.On("GetGamesForUser", mock.Anything).
+	mockManager.On("FindGames", mock.Anything).
 		Return([]q.Game{}, nil)
-	bbCtx, recorder := tu.Build(tu.DefaultFakeContextBuilder())
+	bbCtx, recorder := context.Build(context.DefaultFakeContextBuilder())
 	h := fakeHandler(mockManager)
 
 	result := h.Handle(bbCtx)
@@ -46,7 +52,7 @@ func TestGetGames_ErrorInGameManager(t *testing.T) {
 	mockManager := new(mocks.MockGameManager)
 	mockManager.On("GetGamesForUser", mock.Anything).
 		Return(nil, errors.New("error"))
-	bbCtx, _ := tu.Build(tu.DefaultFakeContextBuilder())
+	bbCtx, _ := context.Build(context.DefaultFakeContextBuilder())
 	h := fakeHandler(mockManager)
 
 	result := h.Handle(bbCtx)
@@ -57,15 +63,15 @@ func TestGetGames_ErrorInGameManager(t *testing.T) {
 }
 
 func TestOverride(t *testing.T) {
-	base := tu.FakeContextBuilder{
+	base := context.FakeContextBuilder{
 		Payload : "base",
 		Path : "base",
-		Game: *q.NewTwoPersonGame(),
+		Game: *q.NewTwoPersonGame(tu.GameIds[0]),
 		Method: "base",
 		Headers: nil,
 	}
 
-	override := base.Override(tu.FakeContextBuilder{
+	override := base.Override(context.FakeContextBuilder{
 		Payload:"override",
 		Method : "override",
 		Game : q.Game{},

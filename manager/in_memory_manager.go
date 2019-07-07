@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"strings"
+	"sync"
 )
 
 type (
 	InMemoryGameManager struct {
 		games map[uuid.UUID]ManagedGame
+		locks map[uuid.UUID]sync.RWMutex
 	}
 )
 
@@ -23,6 +25,7 @@ func (manager *InMemoryGameManager) AddGame(game q.Game) error {
 		return errors.New(fmt.Sprintf("game %s is already managed", gid))
 	}
 	manager.games[gid] = ManagedGame{Game: game.Copy()}
+	manager.locks[gid] = sync.RWMutex{}
 	return nil
 }
 
@@ -39,10 +42,13 @@ func (manager *InMemoryGameManager) GetGamesForUser(playerId uuid.UUID) ([]q.Gam
 }
 
 func (manager *InMemoryGameManager) GetGame(gameId uuid.UUID) (ManagedGame, error) {
-	game, ok := manager.games[gameId]
+	lock, ok := manager.locks[gameId]
 	if !ok {
 		return ManagedGame{}, errors.New(fmt.Sprintf("no game found with id: %s", gameId))
 	}
+	lock.RLock()
+	defer lock.RUnlock()
+	game, ok := manager.games[gameId]
 	game.Game = game.Game.Copy()
 	return game, nil
 }
@@ -56,10 +62,13 @@ func (manager *InMemoryGameManager) FindGame(params GameParameters) ([]ManagedGa
 	for _, game := range manager.games {
 		var shouldAdd bool
 		for _, filter := range filters {
+			lock := manager.locks[game.Game.Id]
+			lock.RLock()
 			shouldAdd = shouldAdd || filter(&game.Game)
+			lock.RUnlock()
 		}
 		if shouldAdd {
-			games = append(games, game)
+			games = append(games, ManagedGame{Game : game.Game.Copy(), modCount: game.modCount})
 		}
 	}
 	return games, nil
@@ -105,5 +114,8 @@ func filtersFromParameters(parameters GameParameters) ([]Filter, error) {
 }
 
 func NewMemoryGameManager() *InMemoryGameManager {
-	return &InMemoryGameManager{games: make(map[uuid.UUID]ManagedGame)}
+	return &InMemoryGameManager{
+		games: make(map[uuid.UUID]ManagedGame),
+		locks: make(map[uuid.UUID]sync.RWMutex),
+	}
 }

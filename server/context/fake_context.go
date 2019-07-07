@@ -2,12 +2,12 @@ package context
 
 import (
 	"boardbots/quoridor"
-	"encoding/json"
 	"github.com/labstack/echo"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"strings"
+	"boardbots/server/player"
 )
 
 type header struct {
@@ -17,7 +17,7 @@ type header struct {
 type FakeContextBuilder struct {
 	Path, Payload, Method string
 	Headers               []header
-	Player                PlayerPrinciple
+	Player                player.PlayerPrinciple
 	Game                  quoridor.Game
 }
 
@@ -27,7 +27,7 @@ func DefaultFakeContextBuilder() FakeContextBuilder {
 		Method:  http.MethodPost,
 		Path:    "/defaulttest",
 		Headers: make([]header, 0, 0),
-		Player:  PlayerPrinciple{},
+		Player:  player.PlayerPrinciple{},
 	}
 }
 func (b FakeContextBuilder) Override(override FakeContextBuilder) FakeContextBuilder {
@@ -69,10 +69,6 @@ func Build(builder FakeContextBuilder) (DefaultBBContext, *httptest.ResponseReco
 		Game:            &builder.Game,
 	}
 	return bbCtx, recorder
-}
-
-func ReadBodyFromRecorder(payload *httptest.ResponseRecorder, response interface{}) {
-	json.NewDecoder(payload.Body).Decode(response)
 }
 
 func FakeContext(method, path, payload string) (echo.Context, *httptest.ResponseRecorder) {

@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
 	"io"
+	"net/http/httptest"
 )
 
 var TestUUID = uuid.MustParse("c67a791f-1d1b-41ae-b21b-14f79d4fdf66")
@@ -22,6 +23,10 @@ func ToJson(body interface{}) io.Reader {
 		return nil
 	}
 	return bytes.NewBuffer(b)
+}
+
+func ReadBodyFromRecorder(payload *httptest.ResponseRecorder, response interface{}) {
+	json.NewDecoder(payload.Body).Decode(response)
 }
 
 /**
