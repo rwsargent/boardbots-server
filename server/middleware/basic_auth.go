@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"boardbots/server/context"
-	"boardbots/server/persistence"
+	"boardbots-server/server/context"
+	"boardbots-server/server/persistence"
 	"errors"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"

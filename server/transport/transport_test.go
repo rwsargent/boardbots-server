@@ -3,8 +3,8 @@ package transport
 import (
 	"testing"
 	"github.com/stretchr/testify/assert"
-	"boardbots/quoridor"
-	"boardbots/util"
+	"boardbots-server/quoridor"
+	"boardbots-server/util"
 )
 const BarrierSize = 3
 

@@ -3,8 +3,8 @@ package manager
 import (
 	"testing"
 
-	q "boardbots/quoridor"
-	tu "boardbots/server/testingutils"
+	q "boardbots-server/quoridor"
+	tu "boardbots-server/server/testingutils"
 	"github.com/stretchr/testify/assert"
 )
 

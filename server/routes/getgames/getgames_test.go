@@ -2,15 +2,15 @@ package getgames
 
 import (
 	"testing"
-	tu "boardbots/server/testingutils"
-	"boardbots/server/mocks"
-	"boardbots/manager"
+	tu "boardbots-server/server/testingutils"
+	"boardbots-server/server/mocks"
+	"boardbots-server/manager"
 	"github.com/stretchr/testify/assert"
-	q "boardbots/quoridor"
+	q "boardbots-server/quoridor"
 	"github.com/stretchr/testify/mock"
 	"errors"
-	"boardbots/server/transport"
-	"boardbots/server/context"
+	"boardbots-server/server/transport"
+	"boardbots-server/server/context"
 )
 
 func TestGetGames_HappyPath(t *testing.T) {

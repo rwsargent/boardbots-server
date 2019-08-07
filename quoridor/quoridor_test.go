@@ -1,8 +1,8 @@
 package quoridor
 
 import (
-	tu "boardbots/server/testingutils"
-	u "boardbots/util"
+	tu "boardbots-server/server/testingutils"
+	u "boardbots-server/util"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"testing"

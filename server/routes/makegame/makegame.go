@@ -1,10 +1,10 @@
 package makegame
 
 import (
-	"boardbots/manager"
-	"boardbots/quoridor"
-	"boardbots/server/context"
-	"boardbots/server/transport"
+	"boardbots-server/manager"
+	"boardbots-server/quoridor"
+	"boardbots-server/server/context"
+	"boardbots-server/server/transport"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -40,7 +40,7 @@ func (h *Handler) MakeGame(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, response)
 	}
 
-	game := quoridor.NewTwoPersonGame()
+	game := quoridor.NewTwoPersonGame(uuid.New())
 	playerPosition, err := game.AddPlayer(bbCtx.PlayerPrinciple.UserId, bbCtx.PlayerPrinciple.UserName)
 	if err != nil {
 		return transport.StandardBadRequestError(err)
@@ -49,11 +49,11 @@ func (h *Handler) MakeGame(ctx echo.Context) error {
 		log.Errorf("new game can't add player")
 		return transport.HandledServerError(errors.New(fmt.Sprintf("new game can't add player, expecting 0 got %d", playerPosition)))
 	}
-	gameId, err := h.GameManager.AddGame(game)
+	err = h.GameManager.AddGame(*game)
 	if err != nil {
 		response.Error = "error saving game, " + err.Error()
 		return echo.NewHTTPError(http.StatusInternalServerError, response)
 	}
-	response.GameId = gameId
+	response.GameId = game.Id
 	return ctx.JSON(http.StatusOK, response)
 }

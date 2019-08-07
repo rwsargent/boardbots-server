@@ -1,8 +1,8 @@
 package context
 
 import (
-	"boardbots/quoridor"
-	"boardbots/server/player"
+	"boardbots-server/quoridor"
+	"boardbots-server/server/player"
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
 )

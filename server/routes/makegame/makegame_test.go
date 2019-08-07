@@ -9,9 +9,9 @@ import (
 	"strings"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"boardbots/server/context"
+	"boardbots-server/server/context"
 	"encoding/json"
-	"boardbots/manager"
+	"boardbots-server/manager"
 )
 
 func TestHandler_MakeGame(t *testing.T) {

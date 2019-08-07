@@ -1,6 +1,6 @@
 package main
 
-import "boardbots/server"
+import "boardbots-server/server"
 
 func main() {
 	server.StartEchoServer()

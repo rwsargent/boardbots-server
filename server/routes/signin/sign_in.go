@@ -1,9 +1,9 @@
 package signin
 
 import (
-	"boardbots/server/persistence"
+	"boardbots-server/server/persistence"
 	"github.com/labstack/echo"
-	"boardbots/server/transport"
+	"boardbots-server/server/transport"
 	"net/http"
 )
 

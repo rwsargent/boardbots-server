@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"github.com/stretchr/testify/mock"
-	"boardbots/server/player"
+	"boardbots-server/server/player"
 )
 
 type UserPortal struct {

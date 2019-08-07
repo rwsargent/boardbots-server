@@ -1,7 +1,7 @@
 package testingutils
 
 import (
-	"boardbots/server/player"
+	"boardbots-server/server/player"
 	"bytes"
 	"encoding/json"
 	"github.com/google/uuid"

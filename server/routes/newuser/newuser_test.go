@@ -2,8 +2,8 @@ package newuser
 
 import (
 	"testing"
-	"boardbots/server/mocks"
-	"boardbots/server/testingutils"
+	"boardbots-server/server/mocks"
+	"boardbots-server/server/testingutils"
 	"net/http"
 	"github.com/stretchr/testify/assert"
 	"github.com/labstack/echo"

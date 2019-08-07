@@ -1,8 +1,8 @@
 package getgames
 
 import (
-	"boardbots/manager"
-	"boardbots/server/transport"
+	"boardbots-server/manager"
+	"boardbots-server/server/transport"
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
 )

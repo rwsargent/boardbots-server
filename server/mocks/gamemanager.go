@@ -1,8 +1,8 @@
 package mocks
 
 import (
-	"boardbots/manager"
-	q "boardbots/quoridor"
+	"boardbots-server/manager"
+	q "boardbots-server/quoridor"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 )

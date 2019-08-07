@@ -1,7 +1,7 @@
 package quoridor
 
 import (
-	"boardbots/util"
+	"boardbots-server/util"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"

@@ -1,13 +1,13 @@
 package context
 
 import (
-	"boardbots/quoridor"
+	"boardbots-server/quoridor"
 	"github.com/labstack/echo"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"strings"
-	"boardbots/server/player"
+	"boardbots-server/server/player"
 )
 
 type header struct {

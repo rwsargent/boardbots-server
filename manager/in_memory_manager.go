@@ -1,7 +1,7 @@
 package manager
 
 import (
-	q "boardbots/quoridor"
+	q "boardbots-server/quoridor"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -16,6 +16,10 @@ type (
 	}
 )
 
+func (manager *InMemoryGameManager) FindGames(params GameParameters) ([]ManagedGame, error) {
+	panic("implement me")
+}
+
 func (manager *InMemoryGameManager) AddGame(game q.Game) error {
 	gid := game.Id
 	if gid == uuid.Nil {
@@ -29,12 +33,12 @@ func (manager *InMemoryGameManager) AddGame(game q.Game) error {
 	return nil
 }
 
-func (manager *InMemoryGameManager) GetGamesForUser(playerId uuid.UUID) ([]q.Game, error) {
-	games := make([]q.Game, 0)
+func (manager *InMemoryGameManager) GetGamesForUser(playerId uuid.UUID) ([]ManagedGame, error) {
+	games := make([]ManagedGame, 0)
 	for _, game := range manager.games {
 		for _, player := range game.Game.Players {
 			if player.PlayerId == playerId {
-				games = append(games, game.Game)
+				games = append(games, game)
 			}
 		}
 	}

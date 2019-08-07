@@ -1,7 +1,7 @@
 package quoridor
 
 import (
-	"boardbots/util"
+	"boardbots-server/util"
 	"container/heap"
 	"math"
 )

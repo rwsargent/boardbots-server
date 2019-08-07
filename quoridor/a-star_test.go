@@ -2,7 +2,7 @@ package quoridor
 
 import (
 	"testing"
-	"boardbots/util"
+	"boardbots-server/util"
 	"github.com/stretchr/testify/assert"
 )
 

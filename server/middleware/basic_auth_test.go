@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"testing"
-	"boardbots/server/mocks"
+	"boardbots-server/server/mocks"
 	"github.com/stretchr/testify/assert"
-	"boardbots/server/testingutils"
-	"boardbots/server/context"
+	"boardbots-server/server/testingutils"
+	"boardbots-server/server/context"
 	"github.com/stretchr/testify/mock"
 )
 

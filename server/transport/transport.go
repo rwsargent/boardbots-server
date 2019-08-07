@@ -1,8 +1,8 @@
 package transport
 
 import (
-	quor "boardbots/quoridor"
-	"boardbots/util"
+	quor "boardbots-server/quoridor"
+	"boardbots-server/util"
 	"sort"
 	"github.com/google/uuid"
 	"net/http"

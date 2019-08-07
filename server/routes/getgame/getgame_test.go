@@ -2,15 +2,15 @@ package getgame
 
 import (
 	"testing"
-	tu "boardbots/server/testingutils"
+	tu "boardbots-server/server/testingutils"
 	"net/http"
-	"boardbots/server/context"
-	"boardbots/manager"
+	"boardbots-server/server/context"
+	"boardbots-server/manager"
 	"github.com/google/uuid"
-	"boardbots/quoridor"
+	"boardbots-server/quoridor"
 	"github.com/stretchr/testify/assert"
 	"github.com/labstack/echo"
-	"boardbots/server/transport"
+	"boardbots-server/server/transport"
 )
 
 func TestHandler_GetGame_WithUnparsableId(t *testing.T) {

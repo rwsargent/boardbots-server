@@ -1,10 +1,10 @@
 package newuser
 
 import (
-	"boardbots/server/persistence"
+	"boardbots-server/server/persistence"
 	"github.com/labstack/echo"
 	"net/http"
-	"boardbots/server/transport"
+	"boardbots-server/server/transport"
 )
 
 type (

@@ -1,14 +1,14 @@
 package joingame
 
 import (
-	"boardbots/manager"
+	"boardbots-server/manager"
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
 	"net/http"
-	"boardbots/server/transport"
+	"boardbots-server/server/transport"
 	"fmt"
-	"boardbots/quoridor"
-	"boardbots/server/context"
+	"boardbots-server/quoridor"
+	"boardbots-server/server/context"
 )
 
 type (
@@ -35,12 +35,12 @@ func (h *Handler) JoinGame(ctx echo.Context) error {
 		})
 	}
 	game, err := (h.GameManager).GetGame(req.GameId)
-	if game == nil {
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, transport.BaseResponse{
 			Error : fmt.Sprintf("Could not find a game with id: %s. %s", req.GameId.String(), err),
 		})
 	}
-	player, err := game.AddPlayer(bbCtx.PlayerPrinciple.UserId)
+	player, err := game.Game.AddPlayer(bbCtx.PlayerPrinciple.UserId, bbCtx.PlayerPrinciple.UserName)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, transport.BaseResponse{
 			Error : fmt.Sprintf("Game %s as no open spots", req.GameId.String()),
@@ -48,7 +48,7 @@ func (h *Handler) JoinGame(ctx echo.Context) error {
 	}
 	return ctx.JSON(http.StatusOK,  Response{
 		GameResponse: transport.GameResponse{
-			Game: transport.NewTGame(*game),
+			Game: transport.NewTGame(game.Game),
 		},
 		PlayerPosition: player,
 	})

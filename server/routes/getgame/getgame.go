@@ -1,9 +1,9 @@
 package getgame
 
 import (
-	"boardbots/manager"
-	"boardbots/server/context"
-	"boardbots/server/transport"
+	"boardbots-server/manager"
+	"boardbots-server/server/context"
+	"boardbots-server/server/transport"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"

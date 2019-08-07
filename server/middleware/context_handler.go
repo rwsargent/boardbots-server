@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/labstack/echo"
-	"boardbots/server/context"
+	"boardbots-server/server/context"
 )
 
 func ContextHander(h echo.HandlerFunc) echo.HandlerFunc {

@@ -1,12 +1,12 @@
 package movepawn
 
 import (
-	"boardbots/manager"
-	"boardbots/server/transport"
+	"boardbots-server/manager"
+	"boardbots-server/server/transport"
 	"github.com/google/uuid"
-	"boardbots/util"
+	"boardbots-server/util"
 	"github.com/labstack/echo"
-	"boardbots/server/context"
+	"boardbots-server/server/context"
 )
 
 type (

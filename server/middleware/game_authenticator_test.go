@@ -2,13 +2,13 @@ package middleware
 
 import (
 	"testing"
-	"boardbots/manager"
-	"boardbots/server/context"
+	"boardbots-server/manager"
+	"boardbots-server/server/context"
 	"github.com/labstack/echo"
 	"net/http"
 	"github.com/stretchr/testify/assert"
-	tu "boardbots/server/testingutils"
-	"boardbots/quoridor"
+	tu "boardbots-server/server/testingutils"
+	"boardbots-server/quoridor"
 )
 
 var Authenticator = GameAuthenticator{

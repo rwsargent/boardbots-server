@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"github.com/labstack/echo"
-	"boardbots/manager"
-	"boardbots/server/context"
-	"boardbots/server/transport"
-	"boardbots/quoridor"
+	"boardbots-server/manager"
+	"boardbots-server/server/context"
+	"boardbots-server/server/transport"
+	"boardbots-server/quoridor"
 	"github.com/google/uuid"
 	"net/http"
 )
@@ -34,12 +34,12 @@ func (ga *GameAuthenticator) Authenticate(next echo.HandlerFunc) echo.HandlerFun
 			return transport.StandardBadRequestError(err)
 		}
 		bbCtx := ctx.(context.DefaultBBContext)
-		if !playerInGame(game.Players, bbCtx.PlayerPrinciple.UserId) {
+		if !playerInGame(game.Game.Players, bbCtx.PlayerPrinciple.UserId) {
 			return echo.NewHTTPError(http.StatusForbidden, transport.BaseResponse{
 				Error: "you do not have access to this game",
 			})
 		}
-		bbCtx.Game = game
+		bbCtx.Game = &game.Game
 		return next(ctx)
 	}
 }

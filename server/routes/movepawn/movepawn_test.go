@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"net/http"
-	"boardbots/server/context"
-	"boardbots/quoridor"
-	tu "boardbots/server/testingutils"
+	"boardbots-server/server/context"
+	"boardbots-server/quoridor"
+	tu "boardbots-server/server/testingutils"
 	"github.com/google/uuid"
 	"fmt"
 )

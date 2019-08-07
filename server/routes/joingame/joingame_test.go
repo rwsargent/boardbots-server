@@ -7,14 +7,14 @@ import (
 	"net/http/httptest"
 	"strings"
 	"net/http"
-	"boardbots/manager"
+	"boardbots-server/manager"
 	"github.com/google/uuid"
-	"boardbots/quoridor"
+	"boardbots-server/quoridor"
 	"github.com/stretchr/testify/assert"
-	"boardbots/server/transport"
-	"boardbots/server/context"
+	"boardbots-server/server/transport"
+	"boardbots-server/server/context"
 	"encoding/json"
-	"boardbots/server/testingutils"
+	"boardbots-server/server/testingutils"
 )
 
 func TestHandler_JoinGame(t *testing.T) {

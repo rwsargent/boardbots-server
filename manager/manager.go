@@ -1,7 +1,7 @@
 package manager
 
 import (
-	q "boardbots/quoridor"
+	q "boardbots-server/quoridor"
 	"errors"
 	"github.com/google/uuid"
 )
