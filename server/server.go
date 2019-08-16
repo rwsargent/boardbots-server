@@ -1,62 +1,28 @@
 package server
 
 import (
-	"github.com/labstack/echo"
-	em "github.com/labstack/echo/middleware"
-	"github.com/labstack/gommon/log"
-	"os"
-	"os/signal"
+	pb "boardbots-server/bbpb"
 	"context"
-	"time"
-	"boardbots-server/server/routes/makegame"
-	"boardbots-server/manager"
-	"boardbots-server/server/middleware"
-	"boardbots-server/server/routes/newuser"
-	"boardbots-server/server/persistence"
-	"boardbots-server/server/transport"
-	"boardbots-server/server/routes/signin"
-	"boardbots-server/server/routes/getgames"
-	"boardbots-server/server/routes/joingame"
 )
 
-const ApiPrefix = "/api/v0"
+type Server struct{}
 
-func StartEchoServer() {
-	server := echo.New()
-	server.Logger.SetLevel(log.DEBUG)
-	server.Use(em.Logger())
-	transport.EchoErrorHandler(server)
-	userPortal := persistence.NewMemoryPortal()
-	gameManager := manager.NewMemoryGameManager()
-
-	newuser.ApplyRoute(server, userPortal)
-	signin.ApplyRoute(server, userPortal)
-
-	api := server.Group(ApiPrefix, middleware.ContextHander)
-	api.Use(em.BasicAuthWithConfig(middleware.GetBasicAuthenticator(userPortal)))
-	makegame.ApplyRoute(api, gameManager)
-
-	gamesApi := api.Group("/g", middleware.Authenticator(gameManager))
-	getgames.ApplyRoute(gamesApi, gameManager)
-	joingame.ApplyRoute(gamesApi, gameManager)
-
-
-	go func() {
-		if err := server.Start(":8080"); err != nil {
-			server.Logger.Infof("error on init, shutting down server. %v\n", err)
-		}
-	}()
-
-	shutdownGracefully(server)
+func (server *Server) GetGames(ctx context.Context, request *pb.GameRequest) (*pb.GameResponse, error) {
+	uuid := request.GameId
+	reversed := reverse(uuid.GetValue())
+	return &pb.GameResponse{
+		GameId: &pb.UUID{Value: reversed},
+	}, nil
 }
 
-func shutdownGracefully(server *echo.Echo) {
-	quit := make(chan os.Signal)
-	signal.Notify(quit, os.Interrupt)
-	<-quit
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := server.Shutdown(ctx); err != nil {
-		server.Logger.Fatal(err)
+func NewServer() *Server {
+ return &Server{}
+}
+
+func reverse(s string) string {
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
 	}
+	return string(runes)
 }

@@ -1,7 +1,40 @@
 package main
 
-import "boardbots-server/server"
+import (
+	pb "boardbots-server/bbpb"
+	"boardbots-server/server"
+	"context"
+	"fmt"
+	"google.golang.org/grpc"
+	"log"
+	"net"
+	"os"
+	"os/signal"
+	"time"
+)
 
 func main() {
-	server.StartEchoServer()
+	lis, err := net.Listen("tcp", ":8765")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
+	pb.RegisterBoardbotsServiceServer(s, server.NewServer())
+	go func() {
+		if err := s.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+	shutdownGracefully(s)
+	//server.StartEchoServer()
+}
+
+func shutdownGracefully(grpc *grpc.Server) {
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	_, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	fmt.Printf("Shutting down")
+	defer cancel()
+	grpc.GracefulStop()
 }
