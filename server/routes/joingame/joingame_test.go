@@ -3,18 +3,18 @@ package joingame
 import (
 	"testing"
 
+	"boardbots-server/manager"
+	"boardbots-server/quoridor"
+	"boardbots-server/server/context"
+	"boardbots-server/server/testingutils"
+	"boardbots-server/server/transport"
+	"encoding/json"
+	"github.com/google/uuid"
 	"github.com/labstack/echo"
+	"github.com/stretchr/testify/assert"
+	"net/http"
 	"net/http/httptest"
 	"strings"
-	"net/http"
-	"boardbots-server/manager"
-	"github.com/google/uuid"
-	"boardbots-server/quoridor"
-	"github.com/stretchr/testify/assert"
-	"boardbots-server/server/transport"
-	"boardbots-server/server/context"
-	"encoding/json"
-	"boardbots-server/server/testingutils"
 )
 
 func TestHandler_JoinGame(t *testing.T) {
@@ -49,7 +49,7 @@ func TestPlayerIsAddedToGame(t *testing.T) {
 		ctx,
 		context.PlayerPrinciple{
 			UserName: "name",
-			UserId: uuid.MustParse("54321543-3a2e-402a-852b-737321e3ec7d")},
+			UserId:   uuid.MustParse("54321543-3a2e-402a-852b-737321e3ec7d")},
 		nil}
 	game := quoridor.NewTwoPersonGame()
 	game.Players[quoridor.PlayerOne].PlayerId = uuid.New()

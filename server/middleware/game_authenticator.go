@@ -1,12 +1,12 @@
 package middleware
 
 import (
-	"github.com/labstack/echo"
 	"boardbots-server/manager"
+	"boardbots-server/quoridor"
 	"boardbots-server/server/context"
 	"boardbots-server/server/transport"
-	"boardbots-server/quoridor"
 	"github.com/google/uuid"
+	"github.com/labstack/echo"
 	"net/http"
 )
 

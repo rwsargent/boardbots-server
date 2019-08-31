@@ -1,22 +1,22 @@
 package server
 
 import (
+	"boardbots-server/manager"
+	"boardbots-server/server/middleware"
+	"boardbots-server/server/persistence"
+	"boardbots-server/server/routes/getgames"
+	"boardbots-server/server/routes/joingame"
+	"boardbots-server/server/routes/makegame"
+	"boardbots-server/server/routes/newuser"
+	"boardbots-server/server/routes/signin"
+	"boardbots-server/server/transport"
+	"context"
 	"github.com/labstack/echo"
 	em "github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
 	"os"
 	"os/signal"
-	"context"
 	"time"
-	"boardbots-server/server/routes/makegame"
-	"boardbots-server/manager"
-	"boardbots-server/server/middleware"
-	"boardbots-server/server/routes/newuser"
-	"boardbots-server/server/persistence"
-	"boardbots-server/server/transport"
-	"boardbots-server/server/routes/signin"
-	"boardbots-server/server/routes/getgames"
-	"boardbots-server/server/routes/joingame"
 )
 
 const ApiPrefix = "/api/v0"
@@ -39,7 +39,6 @@ func StartEchoServer() {
 	gamesApi := api.Group("/g", middleware.Authenticator(gameManager))
 	getgames.ApplyRoute(gamesApi, gameManager)
 	joingame.ApplyRoute(gamesApi, gameManager)
-
 
 	go func() {
 		if err := server.Start(":8080"); err != nil {

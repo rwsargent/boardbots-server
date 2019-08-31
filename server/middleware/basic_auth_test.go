@@ -1,12 +1,12 @@
 package middleware
 
 import (
-	"testing"
-	"boardbots-server/server/mocks"
-	"github.com/stretchr/testify/assert"
-	"boardbots-server/server/testingutils"
 	"boardbots-server/server/context"
+	"boardbots-server/server/mocks"
+	"boardbots-server/server/testingutils"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"testing"
 )
 
 func TestBasicAuth(t *testing.T) {

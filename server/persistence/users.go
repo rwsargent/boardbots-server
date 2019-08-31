@@ -18,15 +18,16 @@ type (
 	}
 
 	InMemoryUsers struct {
-		lock sync.RWMutex
+		lock        sync.RWMutex
 		Credentials map[string]string
-		Principles map[string]player.PlayerPrinciple
+		Principles  map[string]player.PlayerPrinciple
 	}
 )
+
 func NewMemoryPortal() *InMemoryUsers {
 	return &InMemoryUsers{
 		Credentials: make(map[string]string, 0),
-		Principles: make(map[string]player.PlayerPrinciple, 0),
+		Principles:  make(map[string]player.PlayerPrinciple, 0),
 	}
 }
 func (portal *InMemoryUsers) ValidateCredentials(username, password string) bool {
@@ -52,13 +53,13 @@ func (portal *InMemoryUsers) GetPlayerPrinciple(username string) (player.PlayerP
 func (portal *InMemoryUsers) NewUser(username, password string) error {
 	portal.lock.Lock()
 	defer portal.lock.Unlock()
-	if _, userExists :=  portal.Credentials[username]; userExists {
+	if _, userExists := portal.Credentials[username]; userExists {
 		return transport.NewHandledError(http.StatusConflict, "username already exists")
 	}
 	portal.Credentials[username] = password
 	portal.Principles[username] = player.PlayerPrinciple{
 		UserName: username,
-		UserId : uuid.New(),
+		UserId:   uuid.New(),
 	}
 	return nil
 }

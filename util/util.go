@@ -1,6 +1,5 @@
 package util
 
-
 type Position struct {
 	Row int `json:"row"`
 	Col int `json:"col"`

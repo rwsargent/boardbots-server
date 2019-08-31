@@ -1,16 +1,16 @@
 package getgames
 
 import (
-	"testing"
-	tu "boardbots-server/server/testingutils"
-	"boardbots-server/server/mocks"
 	"boardbots-server/manager"
-	"github.com/stretchr/testify/assert"
 	q "boardbots-server/quoridor"
-	"github.com/stretchr/testify/mock"
-	"errors"
-	"boardbots-server/server/transport"
 	"boardbots-server/server/context"
+	"boardbots-server/server/mocks"
+	tu "boardbots-server/server/testingutils"
+	"boardbots-server/server/transport"
+	"errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"testing"
 )
 
 func TestGetGames_HappyPath(t *testing.T) {
@@ -18,8 +18,8 @@ func TestGetGames_HappyPath(t *testing.T) {
 	mockManager.On("FindGames", mock.Anything).
 		Return([]manager.ManagedGame{
 			{Game: *q.NewTwoPersonGame(tu.TestUUID)},
-			{Game:*q.NewTwoPersonGame(tu.TestMissingUUID)},
-			{Game: *q.NewTwoPersonGame(tu.GameIds[0])},}, nil)
+			{Game: *q.NewTwoPersonGame(tu.TestMissingUUID)},
+			{Game: *q.NewTwoPersonGame(tu.GameIds[0])}}, nil)
 	bbCtx, recorder := context.Build(context.DefaultFakeContextBuilder().Override(context.FakeContextBuilder{
 		Payload: "{}",
 	}))
@@ -64,17 +64,17 @@ func TestGetGames_ErrorInGameManager(t *testing.T) {
 
 func TestOverride(t *testing.T) {
 	base := context.FakeContextBuilder{
-		Payload : "base",
-		Path : "base",
-		Game: *q.NewTwoPersonGame(tu.GameIds[0]),
-		Method: "base",
+		Payload: "base",
+		Path:    "base",
+		Game:    *q.NewTwoPersonGame(tu.GameIds[0]),
+		Method:  "base",
 		Headers: nil,
 	}
 
 	override := base.Override(context.FakeContextBuilder{
-		Payload:"override",
-		Method : "override",
-		Game : q.Game{},
+		Payload: "override",
+		Method:  "override",
+		Game:    q.Game{},
 	})
 
 	assert.Equal(t, override.Payload, "override")
@@ -82,7 +82,6 @@ func TestOverride(t *testing.T) {
 	assert.Equal(t, override.Method, "override")
 	assert.Nil(t, override.Headers)
 	assert.Equal(t, override.Game, base.Game)
-
 
 }
 

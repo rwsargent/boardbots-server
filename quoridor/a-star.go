@@ -11,7 +11,7 @@ import (
  */
 type PQNode struct {
 	position util.Position
-	prev *PQNode
+	prev     *PQNode
 
 	distance, priority int
 }
@@ -19,9 +19,9 @@ type PQNode struct {
 // Calculates the priority of the node as sum of distance to goal + path so far
 func (node *PQNode) setPriority(goal util.Position) {
 	if goal.Row < 0 {
-		node.priority = util.AbsInt(goal.Col - node.position.Col) + node.distance
+		node.priority = util.AbsInt(goal.Col-node.position.Col) + node.distance
 	} else if goal.Col < 0 {
-		node.priority = util.AbsInt(goal.Row- node.position.Row) + node.distance
+		node.priority = util.AbsInt(goal.Row-node.position.Row) + node.distance
 	}
 }
 
@@ -29,7 +29,8 @@ func (node *PQNode) setPriority(goal util.Position) {
  * Priority Queue methods for the heap
  */
 type PriorityQueue []*PQNode
-func (pq PriorityQueue) Len() int {return len(pq)}
+
+func (pq PriorityQueue) Len() int { return len(pq) }
 func (pq PriorityQueue) Less(left, right int) bool {
 	return pq[left].priority < pq[right].priority
 }
@@ -52,7 +53,7 @@ func (pq *PriorityQueue) Pop() interface{} {
  * Simple A* Algorithm, implementing a best first search by calculating distance to goal plus
  * the length of path from the pawn.
  */
-func (game *Game) FindPath(start, goal util.Position ) []util.Position {
+func (game *Game) FindPath(start, goal util.Position) []util.Position {
 	pq := &PriorityQueue{}
 	heap.Init(pq)
 	//breath-first / best-first
@@ -63,7 +64,7 @@ func (game *Game) FindPath(start, goal util.Position ) []util.Position {
 		if reachedGoal(node.position, goal) {
 			return buildPath(node)
 		}
-		if _, seen := visited[node.position] ; seen {
+		if _, seen := visited[node.position]; seen {
 			continue
 		}
 		visited[node.position] = true
@@ -84,7 +85,7 @@ func getReachableNeighbors(node *PQNode, goal util.Position, game *Game) []*PQNo
 		neighborPositions := game.Board.getValidMoveByDirection(node.position, dir)
 		if neighborPositions != nil {
 			for _, neighborPos := range neighborPositions {
-				node := &PQNode{position:neighborPos, prev : node, priority: math.MaxInt32, distance: node.distance + 1}
+				node := &PQNode{position: neighborPos, prev: node, priority: math.MaxInt32, distance: node.distance + 1}
 				node.setPriority(goal)
 				neighbors = append(neighbors, node)
 			}
@@ -101,8 +102,8 @@ func buildPath(node *PQNode) []util.Position {
 		cursor = cursor.prev
 	}
 	//reverse
-	for idx := len(path)/2-1; idx >= 0; idx-- {
-		opp := len(path)-1- idx
+	for idx := len(path)/2 - 1; idx >= 0; idx-- {
+		opp := len(path) - 1 - idx
 		path[idx], path[opp] = path[opp], path[idx]
 	}
 	return path

@@ -11,7 +11,7 @@ const GetGamesRoute = "/getgames"
 
 type (
 	Request struct {
-		Status string
+		Status  string
 		Players []string
 	}
 
@@ -50,7 +50,7 @@ func (h Handler) Handle(ctx echo.Context) error {
 
 func convertRequestToParams(request Request) manager.GameParameters {
 	return manager.GameParameters{
-		Players: request.Players,
+		Players:   request.Players,
 		GameState: request.Status,
 	}
 }

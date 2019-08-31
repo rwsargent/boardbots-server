@@ -6,14 +6,14 @@ import (
 
 type (
 	HandledError struct {
-		Code int
+		Code    int
 		Message string
 	}
 )
 
-func NewHandledError(code int, message string) HandledError{
+func NewHandledError(code int, message string) HandledError {
 	return HandledError{
-		Code : code,
+		Code:    code,
 		Message: message,
 	}
 }
@@ -24,7 +24,7 @@ func (e HandledError) Error() string {
 func EchoErrorHandler(server *echo.Echo) {
 	server.HTTPErrorHandler = func(e error, context echo.Context) {
 		if handledError, ok := e.(HandledError); ok {
-			resp := BaseResponse {
+			resp := BaseResponse{
 				Error: handledError.Error(),
 			}
 			if !context.Response().Committed {

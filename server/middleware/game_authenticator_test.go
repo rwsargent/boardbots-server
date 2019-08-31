@@ -1,14 +1,14 @@
 package middleware
 
 import (
-	"testing"
 	"boardbots-server/manager"
-	"boardbots-server/server/context"
-	"github.com/labstack/echo"
-	"net/http"
-	"github.com/stretchr/testify/assert"
-	tu "boardbots-server/server/testingutils"
 	"boardbots-server/quoridor"
+	"boardbots-server/server/context"
+	tu "boardbots-server/server/testingutils"
+	"github.com/labstack/echo"
+	"github.com/stretchr/testify/assert"
+	"net/http"
+	"testing"
 )
 
 var Authenticator = GameAuthenticator{
@@ -21,16 +21,16 @@ var next = func(ctx echo.Context) error {
 }
 
 func Test_GameAuthenticator(t *testing.T) {
-	ctx, _ := tu.FakeContext(http.MethodPost, "/", 	`{"gameId":"` + tu.TestUUID.String() + "\"}")
+	ctx, _ := tu.FakeContext(http.MethodPost, "/", `{"gameId":"`+tu.TestUUID.String()+"\"}")
 
 	bbCtx := context.DefaultBBContext{
-		Context : ctx,
-		PlayerPrinciple : context.PlayerPrinciple{
-			UserId: tu.TestUUID,
-			UserName : "Ryan!",
-			Password : "Password",
+		Context: ctx,
+		PlayerPrinciple: context.PlayerPrinciple{
+			UserId:   tu.TestUUID,
+			UserName: "Ryan!",
+			Password: "Password",
 		},
-		Game : nil,
+		Game: nil,
 	}
 
 	authHandler := GameAuthenticator{

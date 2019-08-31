@@ -1,14 +1,13 @@
 package quoridor
 
 import (
-	"testing"
 	"boardbots-server/util"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestStraightShot(t *testing.T) {
-	var StraightShot =
-`........0........
+	var StraightShot = `........0........
 .................
 .................
 .................
@@ -44,8 +43,7 @@ func TestStraightShot(t *testing.T) {
 }
 
 func TestBarriersInFrontOfPawn(t *testing.T) {
-	var ToTheSide =
-`........0........
+	var ToTheSide = `........0........
 .----------------
 .................
 .................
@@ -70,13 +68,12 @@ func TestBarriersInFrontOfPawn(t *testing.T) {
 
 	path := game.FindPath(util.Position{0, 8}, util.Position{16, -1})
 	assert.Len(t, path, 12, "path is the wrong length")
-	assert.Equal(t, path[0], util.Position{0,6}, "starting Position of path is incorrect")
-	assert.Equal(t,  util.Position{16,0}, path[len(path)-1], "end Position of path is incorrect")
+	assert.Equal(t, path[0], util.Position{0, 6}, "starting Position of path is incorrect")
+	assert.Equal(t, util.Position{16, 0}, path[len(path)-1], "end Position of path is incorrect")
 }
 
 func TestBarriersBlockGoal(t *testing.T) {
-	var NoWayOut =
-`........0........
+	var NoWayOut = `........0........
 -----------------
 .................
 .................
@@ -104,8 +101,7 @@ func TestBarriersBlockGoal(t *testing.T) {
 }
 
 func TestSnakeBoard(t *testing.T) {
-	var SnakeBoard =
-`........0........
+	var SnakeBoard = `........0........
 .----------------
 .................
 ----------------.
@@ -128,14 +124,13 @@ func TestSnakeBoard(t *testing.T) {
 		t.Error(err.Error())
 	}
 
-	path := game.FindPath(util.Position{0,8}, util.Position{16, -1})
+	path := game.FindPath(util.Position{0, 8}, util.Position{16, -1})
 	assert.Len(t, path, 68)
 	assert.Equal(t, util.Position{16, 16}, path[len(path)-1])
 }
 
 func TestGoesBackwardsToGoForwards(t *testing.T) {
-	var GoBackwards =
-`.................
+	var GoBackwards = `.................
 .................
 .......|0........
 .......|..---.---
@@ -158,14 +153,13 @@ func TestGoesBackwardsToGoForwards(t *testing.T) {
 		t.Error(err.Error())
 	}
 
-	path := game.FindPath(util.Position{2,8}, util.Position{16, -1})
+	path := game.FindPath(util.Position{2, 8}, util.Position{16, -1})
 	assert.Len(t, path, 10)
 	assert.Equal(t, util.Position{16, 6}, path[len(path)-1])
 }
 
 func TestCanJumpPawnDiagonal(t *testing.T) {
-	var GoBackwards =
-`.......|.........
+	var GoBackwards = `.......|.........
 .......|.........
 .......|0........
 .......|..---.---
@@ -188,7 +182,7 @@ func TestCanJumpPawnDiagonal(t *testing.T) {
 		t.Error(err.Error())
 	}
 
-	path := game.FindPath(util.Position{2,8}, util.Position{16, -1})
+	path := game.FindPath(util.Position{2, 8}, util.Position{16, -1})
 	assert.Len(t, path, 14)
 	assert.Equal(t, util.Position{16, 8}, path[len(path)-1])
 }

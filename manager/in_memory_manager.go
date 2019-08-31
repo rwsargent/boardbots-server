@@ -72,7 +72,7 @@ func (manager *InMemoryGameManager) FindGame(params GameParameters) ([]ManagedGa
 			lock.RUnlock()
 		}
 		if shouldAdd {
-			games = append(games, ManagedGame{Game : game.Game.Copy(), modCount: game.modCount})
+			games = append(games, ManagedGame{Game: game.Game.Copy(), modCount: game.modCount})
 		}
 	}
 	return games, nil

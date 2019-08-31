@@ -1,17 +1,17 @@
 package newuser
 
 import (
-	"testing"
 	"boardbots-server/server/mocks"
 	"boardbots-server/server/testingutils"
-	"net/http"
-	"github.com/stretchr/testify/assert"
 	"github.com/labstack/echo"
+	"github.com/stretchr/testify/assert"
+	"net/http"
+	"testing"
 )
 
 func TestNewUserSuccess(t *testing.T) {
-  mockPortal := mocks.UserPortal{}
-  mockPortal.On("NewUser", "username", "pass").Return(nil)
+	mockPortal := mocks.UserPortal{}
+	mockPortal.On("NewUser", "username", "pass").Return(nil)
 	handler := Handler{
 		UserPortal: mockPortal,
 	}

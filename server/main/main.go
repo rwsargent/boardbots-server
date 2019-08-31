@@ -19,14 +19,13 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterBoardbotsServiceServer(s, server.NewServer())
+	pb.RegisterBoardbotsServiceServer(s, server.NewServer(server.Development))
 	go func() {
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
 	}()
 	shutdownGracefully(s)
-	//server.StartEchoServer()
 }
 
 func shutdownGracefully(grpc *grpc.Server) {

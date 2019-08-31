@@ -3,21 +3,21 @@ package makegame
 import (
 	"testing"
 
-	"net/http"
-	"github.com/labstack/echo"
-	"net/http/httptest"
-	"strings"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
+	"boardbots-server/manager"
 	"boardbots-server/server/context"
 	"encoding/json"
-	"boardbots-server/manager"
+	"github.com/google/uuid"
+	"github.com/labstack/echo"
+	"github.com/stretchr/testify/assert"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 )
 
 func TestHandler_MakeGame(t *testing.T) {
 	ctx, recorder := fakeContext(http.MethodPost, "/makegame", `{"PlayerCount" : 2}`)
 	id := uuid.MustParse("2ce1f41c-3a2e-402a-852b-737321e3ec7d")
-	bbCtx := context.DefaultBBContext{Context: ctx, PlayerPrinciple : context.PlayerPrinciple{"name", id, "password"}}
+	bbCtx := context.DefaultBBContext{Context: ctx, PlayerPrinciple: context.PlayerPrinciple{"name", id, "password"}}
 	h := fakeHandler("2ce1f41c-3a2e-402a-852b-737321e3db7a")
 	result := h.MakeGame(bbCtx)
 
@@ -31,7 +31,7 @@ func TestHandler_MakeGame(t *testing.T) {
 
 func TestHandler_MakeGame_NoPlayerPrinciple(t *testing.T) {
 	ctx, _ := fakeContext(http.MethodPost, "/makegame", `{"PlayerCount" : 2}`)
-	bbCtx := context.DefaultBBContext{Context : ctx, PlayerPrinciple : context.PlayerPrinciple{}}
+	bbCtx := context.DefaultBBContext{Context: ctx, PlayerPrinciple: context.PlayerPrinciple{}}
 	h := fakeHandler("2ce1f41c-3a2e-402a-852b-737321e3db7a")
 
 	result := h.MakeGame(bbCtx).(*echo.HTTPError)
@@ -51,7 +51,7 @@ func fakeHandler(id string) Handler {
 	return Handler{GameManager: &gameManager}
 }
 
-func fakeContext(method , path, payload string) (echo.Context, *httptest.ResponseRecorder) {
+func fakeContext(method, path, payload string) (echo.Context, *httptest.ResponseRecorder) {
 	e := echo.New()
 	req := httptest.NewRequest(method, path, strings.NewReader(payload))
 	recorder := httptest.NewRecorder()
@@ -64,5 +64,3 @@ func getPayloadFromResponse(recorder *httptest.ResponseRecorder) Response {
 	decoder.Decode(&res)
 	return res
 }
-
-

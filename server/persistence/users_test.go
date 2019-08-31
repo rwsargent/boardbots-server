@@ -1,9 +1,9 @@
 package persistence
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
 	"os"
+	"testing"
 )
 
 var portal InMemoryUsers
